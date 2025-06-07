@@ -1,14 +1,34 @@
 version: '3.8'
 
+networks:
+  damage-detection-network:
+    driver: bridge
+
+volumes:
+  model-data:
+
 services:
-  web:
+  backend:
+    container_name: damage-detection-backend
+    restart: always
     build:
-      context: .
+      context: ./
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    environment:
+      - APP_UVICORN__HOST=0.0.0.0
+      - APP_UVICORN__PORT=8000
+      - APP_UVICORN__WORKERS=1
+      - APP_CORS__ALLOW_ORIGINS=["*"]
+      - APP_CORS__ALLOW_CREDENTIALS=false
+      - APP_CORS__ALLOW_METHODS=["*"]
+      - APP_CORS__ALLOW_HEADERS=["*"]
+      - DEBUG=true
+      - PYTHONUNBUFFERED=1
     volumes:
       - ./ML_models:/app/ML_models
-    environment:
-      - PYTHONUNBUFFERED=1
+      - model-data:/app/output
+    networks:
+      - damage-detection-network
     command: uvicorn web_app:main --host 0.0.0.0 --port 8000 --reload
