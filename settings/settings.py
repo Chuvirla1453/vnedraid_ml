@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Uvicorn(BaseModel):
-    host: str = "localhost"
+    host: str = "0.0.0.0"
     port: int = 8000
     workers: int = mp.cpu_count() * 2 + 1
 

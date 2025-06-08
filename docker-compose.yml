@@ -1,5 +1,3 @@
-version: '3.8'
-
 networks:
   damage-detection-network:
     driver: bridge
@@ -11,6 +9,7 @@ services:
   backend:
     container_name: damage-detection-backend
     restart: always
+    image: auxxxxx/vnedreid2025-ml_model:latest
     build:
       context: ./
       dockerfile: Dockerfile
@@ -31,4 +30,4 @@ services:
       - model-data:/app/output
     networks:
       - damage-detection-network
-    command: uvicorn web_app:main --host 0.0.0.0 --port 8000 --reload
+    command: python web_app.py

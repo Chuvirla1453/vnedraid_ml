@@ -1,32 +1,40 @@
-# Базовый образ. По умолчанию берется из https://hub.docker.com/_/python
+# Базовый образ Python
 FROM python:3.10-slim
 
-# Поменять рабочую директорию. Если ее нет, создать ее.
-WORKDIR /app
-
-# Установка системных зависимостей
+# Установка системных зависимостей для OpenCV
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Копирование файлов зависимостей
+# Рабочая директория
+WORKDIR /app
+
+# Копирование файла зависимостей
 COPY requirements.txt .
 
-# Установка Python зависимостей
-RUN pip install --no-cache-dir -r requirements.txt
+# Установка PyTorch и связанных библиотек
+RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# Установка ultralytics без зависимостей
+RUN pip install "ultralytics~=8.3.151" --no-deps
+
+# Установка остальных зависимостей
+RUN pip install -r requirements.txt
 
 # Копирование исходного кода
 COPY . .
 
-# Создание директории для выходных данных
-RUN mkdir -p output/runs/predict
-
 # Установка переменных окружения
 ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
 
 # Открытие порта
 EXPOSE 8000
 
 # Запуск приложения
-CMD ["uvicorn", "web_app:main", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["python", "web_app.py"]

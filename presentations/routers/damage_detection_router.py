@@ -11,7 +11,7 @@ import tempfile
 from loguru import logger
 
 router = APIRouter(
-    prefix="/damage-detection",
+    prefix="/model/damage-detection",
     tags=["damage-detection"]
 )
 
